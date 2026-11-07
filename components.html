@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Components — Panopticon</title>
+<meta name="description" content="The Panopticon repositories: Windows agent, Linux sensor, detection engine, response engine, Manager, console and contracts — what each does and how far it has been verified.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23c4531f' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%231d2230'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Panopticon home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="var(--orange)" stroke-width="2.5"/><g stroke="var(--ink-3)" stroke-width="1.5"><path d="M16 3v5M16 24v5M3 16h5M24 16h5M6.8 6.8l3.5 3.5M21.7 21.7l3.5 3.5M6.8 25.2l3.5-3.5M21.7 10.3l3.5-3.5"/></g><circle cx="16" cy="16" r="4.5" fill="var(--ink)"/></svg>
+      <span>PANOPTICON<small>Endpoint detection &amp; response</small></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="./">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="components.html" aria-current="page">Components</a>
+      <a href="diagrams.html">Diagrams</a>
+      <a href="team.html">Team</a>
+      <a href="https://github.com/Panopticon-Co">GitHub</a>
+    </nav>
+    <button class="theme-btn" type="button" aria-label="Toggle theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Components</div>
+      <h1>Seven building blocks, each in its own repository</h1>
+      <p class="lede">Every component has its own CI and its own status documentation. The summaries below link straight to the evidence.</p>
+      <nav class="toc" aria-label="On this page">
+        <a href="#windows">Windows agent</a>
+        <a href="#linux">Linux sensor</a>
+        <a href="#detection">Detection engine</a>
+        <a href="#response">Response engine</a>
+        <a href="#manager">Manager</a>
+        <a href="#console">Console</a>
+        <a href="#contracts">Contracts</a>
+      </nav>
+    </div>
+  </section>
+
+  <section id="windows">
+    <div class="wrap split">
+      <div>
+        <span class="tag blue">C++20 · CMake · vcpkg</span>
+        <h2>Windows agent — Officer</h2>
+        <p>A native Windows endpoint agent. It collects from ETW (including <code>Microsoft-Windows-Kernel-Process</code>), Sysmon, Windows Event Log channels, the USN journal, registry and file integrity, and normalizes everything into canonical endpoint records.</p>
+        <p>Records go through a durable, encrypted on-disk delivery journal to the Manager over HTTPS. Authorized commands run locally: process termination bound to boot and start time, file collection and quarantine, and host isolation through Windows Filtering Platform filters.</p>
+        <p class="small muted">Builds are documented for x64 and ARM64.</p>
+      </div>
+      <div class="callout">
+        <p><b>Verified so far</b></p>
+        <p>Cross-VM end-to-end run on 2026-10-27: 4,059 live canonical records ingested; a <code>KILL_PROCESS</code> command completed a full result-v2 round trip; native CTest 48/48.</p>
+        <p><b>Still open:</b> the capability matrix tracks domains A–AN and states that no domain is yet qualified as complete.</p>
+        <p><a href="https://github.com/Panopticon-Co/panopticon-agent">Repository</a> · <a href="https://github.com/Panopticon-Co/panopticon-agent/blob/main/docs/windows-endpoint/CAPABILITY_MATRIX.md">Capability matrix</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="linux">
+    <div class="wrap split">
+      <div>
+        <span class="tag blue">C++20 · eBPF CO-RE</span>
+        <h2>Linux sensor — panopticon-sensord</h2>
+        <p>A Linux endpoint sensor built on eBPF CO-RE, fanotify and audit netlink. It writes records to an on-disk WAL before delivery and sends them in its own <code>linux-endpoint/1.0</code> envelope.</p>
+        <p>Telemetry families: process, memory and kernel, file, network, authentication (partial), security, containers, host state, policy and response, and self-monitoring (tamper, health, loss).</p>
+        <p>The sensor executes only Manager-signed ES256 commands, signs collected evidence with an endpoint-enrolled key, and isolates hosts through a separate privileged helper.</p>
+      </div>
+      <div class="callout">
+        <p><b>Verified so far</b></p>
+        <p>Validated on Ubuntu 22.04, kernel 5.15, x86_64. Two soak runs completed; the second ran in a degraded environment.</p>
+        <p><b>Still open:</b> the self-integrity monitor has not been soak-tested.</p>
+        <p><a href="https://github.com/Panopticon-Co/panopticon-linux-agent">Repository</a> · <a href="https://github.com/Panopticon-Co/panopticon-linux-agent/blob/main/docs/HANDOFF.md">Handoff and status</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="detection">
+    <div class="wrap">
+      <span class="tag orange">Python</span>
+      <h2>Detection engine — eyedetect</h2>
+      <div class="split">
+        <div>
+          <p>A Python library that turns normalized events into alerts and incidents. Rule types: single-event, sequence, threshold and value-count. Detections are correlated over a provenance graph into incidents, with beaconing detection, an opt-in behavioral rarity baseline, and an experimental ML scorer (<code>panopticon_detection/ml/</code>).</p>
+          <p>The engine detects and recommends. It never executes anything; the Manager runs it in-process.</p>
+          <p><a href="https://github.com/Panopticon-Co/panopticon-detection-engine">Repository</a></p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption class="small muted" style="text-align:left;padding-bottom:6px">69 detection rules across 16 categories, all ATT&amp;CK-mapped</caption>
+            <thead><tr><th>Category</th><th class="num">Rules</th></tr></thead>
+            <tbody>
+              <tr><td>process</td><td class="num">12</td></tr>
+              <tr><td>persistence</td><td class="num">9</td></tr>
+              <tr><td>credential_access · defense_evasion · linux_process · network</td><td class="num">6 each</td></tr>
+              <tr><td>malware · privilege_escalation</td><td class="num">4 each</td></tr>
+              <tr><td>file · impact · lateral_movement</td><td class="num">3 each</td></tr>
+              <tr><td>collection · exfiltration</td><td class="num">2 each</td></tr>
+              <tr><td>discovery · execution · initial_access</td><td class="num">1 each</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="response">
+    <div class="wrap split">
+      <div>
+        <span class="tag orange">Python library</span>
+        <h2>Response engine</h2>
+        <p>Pure domain logic with no I/O: the closed seven-action vocabulary, the two authorization tiers, translation of detection recommendations into typed actions, and the response lifecycle state machine.</p>
+        <p>Like the detection engine, it runs in-process inside the Manager as a pinned submodule.</p>
+        <p><a href="https://github.com/Panopticon-Co/panopticon-response-engine">Repository</a> · <a href="architecture.html#actions">Actions and tiers</a> · <a href="architecture.html#lifecycle">Lifecycle</a></p>
+      </div>
+      <figure class="figure">
+        <img class="zoom" src="assets/diagrams/panopticon-response-sequence.png" alt="Response sequence from staged recommendation through analyst authorization, dispatch and typed result" width="2432" height="1772" loading="lazy">
+        <figcaption>Response sequence: stage, authorize, dispatch, report.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="manager">
+    <div class="wrap split">
+      <div>
+        <span class="tag green">FastAPI · SQLite WAL</span>
+        <h2>Manager</h2>
+        <p>The control plane. It handles endpoint and analyst enrollment, telemetry ingestion, the asynchronous detection worker, response authorization and dispatch, signed evidence custody with artifact key rotation and revocation, and operational health endpoints.</p>
+        <p>Migration 27 added a SHA-256 hash-chained ledger over command audit, response decisions and artifact custody, with a verify endpoint and checkpoints.</p>
+        <p><a href="https://github.com/Panopticon-Co/panopticon-manager">Repository</a> · <a href="https://github.com/Panopticon-Co/panopticon-manager/blob/main/docs/RESPONSE_ENGINE_STATE.md">Response engine state</a> · <a href="architecture.html#api">API surface</a></p>
+      </div>
+      <div class="callout blue">
+        <p><b>Test evidence</b></p>
+        <p>The 2026-10-27 Windows cross-VM validation recorded 285 Manager tests alongside the endpoint run.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="console">
+    <div class="wrap">
+      <span class="tag green">Python · JavaScript</span>
+      <h2>Console</h2>
+      <p class="lede">Analyst views for pipeline health, alerts, incidents and the response queue. A standard-library Python server with no build step, in two modes: live data from the Manager, or offline files.</p>
+      <div class="shots">
+        <figure class="figure">
+          <img class="zoom" src="assets/img/console-alert-detail.png" alt="Alert investigation panel for an encoded PowerShell rule match, showing rule DET-PROC-011, ATT&amp;CK technique T1059.001, matched conditions and evidence" width="1440" height="900" loading="lazy">
+          <figcaption>Alert investigation: rule, ATT&amp;CK mapping, matched conditions and evidence (lab data).</figcaption>
+        </figure>
+        <figure class="figure">
+          <img class="zoom" src="assets/img/console-live-overview.png" alt="Console security overview with pipeline counters and alert feed" width="1440" height="1000" loading="lazy">
+          <figcaption>Security overview (lab data).</figcaption>
+        </figure>
+      </div>
+      <p style="margin-top:14px"><a href="https://github.com/Panopticon-Co/panopticon-console">Repository</a></p>
+    </div>
+  </section>
+
+  <section id="contracts">
+    <div class="wrap split">
+      <div>
+        <span class="tag">JSON Schema</span>
+        <h2>Contracts</h2>
+        <p>The canonical wire schemas: legacy telemetry, Windows endpoint record 1.0, the Linux endpoint envelope, and Command / CommandResult. Golden fixtures ship with them, and producers and consumers test against those fixtures in their own CI.</p>
+        <p><a href="https://github.com/Panopticon-Co/panopticon-contracts">Repository</a> · <a href="https://github.com/Panopticon-Co/panopticon-contracts/blob/master/docs/COMPATIBILITY.md">Compatibility matrix</a></p>
+      </div>
+      <figure class="figure">
+        <img class="zoom" src="assets/diagrams/panopticon-event-data-model.png" alt="Event data model diagram" width="2432" height="1686" loading="lazy">
+        <figcaption>Event data model.</figcaption>
+      </figure>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Panopticon-Co · capstone research project</span>
+    <span><a href="https://github.com/Panopticon-Co">GitHub</a> · <a href="team.html">Team</a> · <a href="https://github.com/Panopticon-Co/panopticon-diagrams">Diagram sources</a></span>
+  </div>
+</footer>
+</body>
+</html>

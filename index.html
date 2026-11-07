@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panopticon — Endpoint Detection and Response</title>
+<meta name="description" content="Panopticon is a multi-repository EDR/XDR capstone platform: Windows and Linux endpoint agents, a correlation-based detection engine, and a closed, analyst-authorized response loop.">
+<meta property="og:title" content="Panopticon — Endpoint Detection and Response">
+<meta property="og:description" content="Endpoint telemetry, detection and controlled response, end to end.">
+<meta property="og:image" content="https://panopticon-co.github.io/assets/diagrams/01-architecture.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23c4531f' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%231d2230'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Panopticon home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="var(--orange)" stroke-width="2.5"/><g stroke="var(--ink-3)" stroke-width="1.5"><path d="M16 3v5M16 24v5M3 16h5M24 16h5M6.8 6.8l3.5 3.5M21.7 21.7l3.5 3.5M6.8 25.2l3.5-3.5M21.7 10.3l3.5-3.5"/></g><circle cx="16" cy="16" r="4.5" fill="var(--ink)"/></svg>
+      <span>PANOPTICON<small>Endpoint detection &amp; response</small></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="./" aria-current="page">Overview</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="components.html">Components</a>
+      <a href="diagrams.html">Diagrams</a>
+      <a href="team.html">Team</a>
+      <a href="https://github.com/Panopticon-Co">GitHub</a>
+    </nav>
+    <button class="theme-btn" type="button" aria-label="Toggle theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Capstone EDR / XDR research platform</div>
+      <h1>Endpoint telemetry, detection and <span>controlled response</span> — end to end.</h1>
+      <p class="lede">Panopticon collects real host telemetry from Windows and Linux endpoints, correlates it into explainable alerts and incidents, and lets an analyst authorize one of seven typed response actions back on the endpoint — with every step recorded in a verifiable audit trail.</p>
+      <div class="cta">
+        <a class="btn primary" href="architecture.html">Explore the architecture</a>
+        <a class="btn" href="diagrams.html">Browse 22 diagrams</a>
+        <a class="btn" href="https://github.com/Panopticon-Co">View on GitHub</a>
+      </div>
+      <div class="stats" role="list">
+        <div class="stat" role="listitem"><b>8</b><span>public repositories</span></div>
+        <div class="stat" role="listitem"><b>2</b><span>endpoint platforms</span></div>
+        <div class="stat" role="listitem"><b>69</b><span>ATT&amp;CK-mapped rules</span></div>
+        <div class="stat" role="listitem"><b>7</b><span>typed response actions</span></div>
+        <div class="stat" role="listitem"><b>674</b><span>commits</span></div>
+        <div class="stat" role="listitem"><b>4</b><span>contributors</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="eyebrow">How it works</div>
+      <h2>From a kernel event to an audited action</h2>
+      <p class="lede">One pipeline, five stages. Detection and execution are deliberately separated: the engines only recommend, and only the endpoint agent ever acts — after the Manager authorizes it.</p>
+      <ol class="pipeline">
+        <li><h3>Collect</h3><p>Officer reads ETW, Sysmon and native Windows sources; the Linux sensor uses eBPF, fanotify and audit netlink.</p></li>
+        <li><h3>Deliver</h3><p>Records are journaled on disk and sent over HTTPS with at-least-once delivery. The Manager acknowledges only after committing them.</p></li>
+        <li><h3>Detect</h3><p>A worker runs rules, sequence and threshold logic, then correlates detections over a provenance graph into incidents.</p></li>
+        <li><h3>Decide</h3><p>Recommendations map onto a closed set of seven actions. Two read-only collections may run automatically; everything else waits for an analyst.</p></li>
+        <li><h3>Act &amp; audit</h3><p>The agent verifies the target, executes, and reports a typed result. Each transition joins a hash-chained audit trail.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="console">
+    <div class="wrap">
+      <div class="eyebrow">The analyst's view</div>
+      <h2>Alerts that explain themselves</h2>
+      <p class="lede">The console shows live pipeline health, the alert feed, correlated incidents with their causal path and itemized score, and the response queue where analysts approve or reject actions.</p>
+      <div class="shots">
+        <figure class="figure">
+          <img class="zoom" src="assets/img/console-live-overview.png" alt="Console security overview showing pipeline counters, alert severities and the live alert feed" width="1440" height="1000" loading="lazy">
+          <figcaption><b>Security overview.</b> Pipeline counters, severity totals and the alert feed, served from the Manager API (lab data).</figcaption>
+        </figure>
+        <figure class="figure">
+          <img class="zoom" src="assets/img/console-incident-detail.png" alt="Incident investigation showing stage timeline, process lineage, causal path and score breakdown" width="1040" height="2200" loading="lazy">
+          <figcaption><b>Incident investigation.</b> Stage timeline, process lineage, causal path and why it scored as it did.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="components">
+    <div class="wrap">
+      <div class="eyebrow">The platform</div>
+      <h2>Eight repositories, one contract</h2>
+      <p class="lede">Each component lives in its own repository with its own CI. They meet only at versioned wire contracts, never at each other's source trees.</p>
+      <div class="grid three">
+        <article class="card"><span class="tag blue">Endpoint · C++20</span><h3><a href="components.html#windows">Windows agent — Officer</a></h3><p>Native telemetry across ETW, Sysmon, Event Log channels, the USN journal, registry and file integrity, with a durable encrypted delivery journal and authorized response execution.</p></article>
+        <article class="card"><span class="tag blue">Endpoint · C++20</span><h3><a href="components.html#linux">Linux sensor</a></h3><p><code>panopticon-sensord</code>: eBPF CO-RE, fanotify and audit collection, an on-disk WAL, signed policy and commands, and self-integrity monitoring.</p></article>
+        <article class="card"><span class="tag orange">Engine · Python</span><h3><a href="components.html#detection">Detection engine</a></h3><p>69 ATT&amp;CK-mapped rules, provenance-graph correlation into incidents, behavioral rarity scoring and an experimental ML scorer. It detects and recommends — never executes.</p></article>
+        <article class="card"><span class="tag orange">Library · Python</span><h3><a href="components.html#response">Response engine</a></h3><p>Pure domain logic: the seven-action vocabulary, authorization tiers, recommendation translation and the response lifecycle state machine.</p></article>
+        <article class="card"><span class="tag green">Control plane · FastAPI</span><h3><a href="components.html#manager">Manager</a></h3><p>Enrollment, ingestion, the detection worker, response authorization and dispatch, signed evidence custody and the audit chain.</p></article>
+        <article class="card"><span class="tag green">UI · Python / JS</span><h3><a href="components.html#console">Console</a></h3><p>Analyst views for alerts, incidents and response decisions, served by a standard-library Python server with no build step.</p></article>
+        <article class="card"><span class="tag">Contracts · JSON Schema</span><h3><a href="components.html#contracts">Contracts</a></h3><p>Canonical schemas and golden fixtures that every producer and consumer is tested against in CI.</p></article>
+        <article class="card"><span class="tag">Docs · HTML / SVG</span><h3><a href="diagrams.html">Diagrams</a></h3><p>22 architecture and UML diagrams, with a CI gate that checks them against the source of the repositories they describe.</p></article>
+        <article class="card"><span class="tag amber">Status</span><h3><a href="#status">Honest by default</a></h3><p>Every repository labels what is implemented, unit tested, verified on a real VM or still pending — and links to the evidence.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="security">
+    <div class="wrap">
+      <div class="eyebrow">Security by design</div>
+      <h2>Built so the response path cannot be abused</h2>
+      <div class="grid two">
+        <div class="card"><h3>A closed action vocabulary</h3><p>Exactly seven typed actions: <code>KILL_PROCESS</code>, <code>COLLECT_PROCESS_INFO</code>, <code>COLLECT_NETWORK_CONNECTIONS</code>, <code>COLLECT_FILE</code>, <code>QUARANTINE_FILE</code>, <code>ISOLATE_HOST</code>, <code>RELEASE_HOST_ISOLATION</code>. There is no path to arbitrary remote execution.</p></div>
+        <div class="card"><h3>Humans approve anything destructive</h3><p>Only <code>COLLECT_PROCESS_INFO</code> and <code>COLLECT_NETWORK_CONNECTIONS</code> may auto-run. Kill, quarantine, file collection and isolation always require an analyst's explicit authorization.</p></div>
+        <div class="card"><h3>No action on a recycled PID</h3><p>Process-targeted commands carry the process start time, and on Windows the boot binding, so an agent refuses to act if the PID now belongs to a different process.</p></div>
+        <div class="card"><h3>Signed commands, verifiable evidence</h3><p>The Linux sensor executes only Manager-signed (ES256) commands. Investigation evidence is signed with endpoint-enrolled keys and verified on every retrieval, and every decision and custody event is appended to a SHA-256 hash-chained audit ledger.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Project status</div>
+        <h2>A research platform, documented honestly</h2>
+        <p>Panopticon is a capstone project, not a commercial or certified product. It follows a vertical-slice roadmap: telemetry → detection → alert first, then response authorization and execution, then breadth.</p>
+        <p class="muted">Claims on this site are summaries. The authoritative, evidence-backed status lives in each repository.</p>
+      </div>
+      <div class="callout blue">
+        <p><b>Where to find the evidence</b></p>
+        <p>
+          Windows agent — <a href="https://github.com/Panopticon-Co/panopticon-agent/blob/main/docs/windows-endpoint/CAPABILITY_MATRIX.md">capability matrix</a><br>
+          Linux sensor — <a href="https://github.com/Panopticon-Co/panopticon-linux-agent/blob/main/docs/HANDOFF.md">handoff and validation status</a><br>
+          Manager — <a href="https://github.com/Panopticon-Co/panopticon-manager/blob/main/docs/RESPONSE_ENGINE_STATE.md">response engine state</a><br>
+          Contracts — <a href="https://github.com/Panopticon-Co/panopticon-contracts/blob/master/docs/COMPATIBILITY.md">compatibility matrix</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Panopticon-Co · capstone research project</span>
+    <span><a href="https://github.com/Panopticon-Co">GitHub</a> · <a href="team.html">Team</a> · <a href="https://github.com/Panopticon-Co/panopticon-diagrams">Diagram sources</a></span>
+  </div>
+</footer>
+</body>
+</html>
